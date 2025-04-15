@@ -373,6 +373,223 @@ Monthly: Full system calibration
 Quarterly: Certification check
 ```
 
+## Application Architecture
+
+### System Overview
+```mermaid
+graph TB
+    subgraph Hardware Layer
+        SM[Smart Meters]
+        CT[Current Transformers]
+        VT[Voltage Transformers]
+        PQA[Power Quality Analyzer]
+    end
+    
+    subgraph Communication Layer
+        DCU[Data Concentrator]
+        GW[Gateway]
+    end
+    
+    subgraph Cloud Layer
+        DB[(Database)]
+        API[API Server]
+        AN[Analytics Engine]
+        ML[ML Models]
+    end
+    
+    subgraph Application Layer
+        UI[User Interface]
+        CAL[Calculation Engine]
+        CACHE[Local Cache]
+        SEC[Security Module]
+    end
+    
+    SM & CT & VT & PQA --> DCU
+    DCU --> GW
+    GW --> API
+    API --> DB
+    API --> AN
+    AN --> ML
+    ML --> API
+    API --> UI
+    UI --> CAL
+    CAL --> CACHE
+    SEC --> UI
+```
+
+### Data Processing Flow
+```mermaid
+sequenceDiagram
+    participant SM as Smart Meter
+    participant DCU as Data Concentrator
+    participant API as Cloud API
+    participant DB as Database
+    participant APP as Mobile App
+    participant UI as User Interface
+    
+    SM->>DCU: Raw Measurements
+    DCU->>DCU: Data Validation
+    DCU->>API: Processed Data
+    API->>DB: Store Data
+    API->>APP: Real-time Updates
+    APP->>APP: Local Calculations
+    APP->>UI: Update Display
+    UI->>APP: User Input
+    APP->>API: Control Commands
+    API->>DCU: Execute Commands
+    DCU->>SM: Apply Changes
+```
+
+### Energy Trading Workflow
+```mermaid
+stateDiagram-v2
+    [*] --> Available: Energy Surplus
+    Available --> Listed: Create Offer
+    Listed --> Reserved: Buyer Found
+    Reserved --> Trading: Payment Confirmed
+    Trading --> Completed: Transfer Done
+    Completed --> [*]
+    
+    Reserved --> Listed: Timeout
+    Trading --> Listed: Failed
+    Listed --> Available: Cancelled
+```
+
+### Real-time Calculations
+```mermaid
+graph LR
+    subgraph Input Data
+        V[Voltage]
+        I[Current]
+        PF[Power Factor]
+        F[Frequency]
+    end
+    
+    subgraph Basic Calculations
+        AP[Active Power]
+        RP[Reactive Power]
+        SP[Apparent Power]
+    end
+    
+    subgraph Advanced Metrics
+        EF[Efficiency]
+        LL[Line Loss]
+        PQ[Power Quality]
+        SI[Stability Index]
+    end
+    
+    V & I --> AP & RP & SP
+    PF --> AP
+    AP & SP --> EF
+    V & I --> LL
+    F & V --> PQ
+    PQ & LL --> SI
+```
+
+### Power Quality Analysis
+```mermaid
+graph TD
+    subgraph Measurements
+        V[Voltage Sampling]
+        I[Current Sampling]
+        F[Frequency]
+    end
+    
+    subgraph FFT Analysis
+        VF[Voltage FFT]
+        IF[Current FFT]
+    end
+    
+    subgraph Calculations
+        THD[THD Calculation]
+        CF[Crest Factor]
+        UN[Unbalance]
+        FL[Flicker]
+    end
+    
+    V --> VF
+    I --> IF
+    VF --> THD & CF
+    IF --> THD
+    V --> UN
+    F --> FL
+```
+
+### Local Storage Architecture
+```mermaid
+graph LR
+    subgraph Cache Layer
+        RC[Real-time Cache]
+        PC[Persistence Cache]
+    end
+    
+    subgraph Data Types
+        M[Measurements]
+        C[Calculations]
+        S[Settings]
+        H[Historical]
+    end
+    
+    subgraph Storage
+        SQ[(SQLite)]
+        SF[Secure Files]
+    end
+    
+    M --> RC
+    C --> RC & PC
+    S --> PC
+    H --> SQ
+    PC --> SF
+```
+
+### Authentication Flow
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant A as App
+    participant B as Biometrics
+    participant API as Server
+    participant JWT as Token Service
+    
+    U->>A: Launch App
+    A->>B: Request Bio Auth
+    B->>U: Prompt Authentication
+    U->>B: Provide Biometrics
+    B->>A: Auth Success
+    A->>API: Login Request
+    API->>JWT: Generate Token
+    JWT->>A: Access Token
+    A->>A: Store Token
+    A->>U: Show Dashboard
+```
+
+### Calculation Pipeline
+```mermaid
+graph TB
+    subgraph Input Processing
+        RD[Raw Data] --> DV[Data Validation]
+        DV --> NM[Normalization]
+    end
+    
+    subgraph Core Calculations
+        NM --> BC[Basic Calculations]
+        BC --> AC[Advanced Calculations]
+        AC --> QM[Quality Metrics]
+    end
+    
+    subgraph Analysis
+        QM --> SA[Statistical Analysis]
+        SA --> PR[Predictions]
+        PR --> AL[Alerts]
+    end
+    
+    subgraph Output
+        AL --> UI[User Interface]
+        AL --> NT[Notifications]
+        PR --> RP[Reports]
+    end
+```
+
 ## Contributing
 This is a proprietary project. No external contributions are accepted.
 
