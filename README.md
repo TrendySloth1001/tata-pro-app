@@ -596,7 +596,8 @@ This is a proprietary project. No external contributions are accepted.
 ## License
 All rights reserved. This is proprietary software.
 
-Copyright © 2024 TATA Smart Grid
+Copyright © 2025 TATA Smart Grid
+by NIKHIL KUMAWAT
 All rights reserved.
 
 This software and associated documentation are proprietary and confidential.
