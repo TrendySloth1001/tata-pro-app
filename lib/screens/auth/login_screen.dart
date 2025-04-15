@@ -160,14 +160,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               ),
               child: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(20.0),
                   child: FadeTransition(
                     opacity: _fadeInAnimation,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildLogo(),
-                        const SizedBox(height: 48),
+                        const SizedBox(height: 40),
                         _buildLoginForm(),
                       ],
                     ),
