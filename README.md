@@ -595,330 +595,22 @@ graph TB
 ### Project Structure
 ```
 lib/
-├── main.dart              # Application entry point
-├── models/               # Data models
-│   ├── energy_usage.dart
-│   ├── user_model.dart
-│   └── device_model.dart
-├── screens/              # UI screens
-│   ├── auth/
-│   ├── dashboard/
-│   └── settings/
-├── services/            # Business logic
-│   ├── api_service.dart
-│   └── storage_service.dart
-├── utils/              # Utility functions
-│   └── app_theme.dart
-└── widgets/           # Reusable components
-    └── custom_chart.dart
+├── app/              # App configuration and theme
+├── features/         # Main feature modules
+├── core/            # Core functionality
+└── shared/          # Shared components
 ```
 
-### Basic Dart Concepts
-
-#### Classes and Objects
-```dart
-// Example of a basic data model
-class EnergyReading {
-  final double voltage;
-  final double current;
-  final DateTime timestamp;
-
-  // Constructor
-  EnergyReading({
-    required this.voltage,
-    required this.current,
-    required this.timestamp,
-  });
-
-  // Factory constructor from JSON
-  factory EnergyReading.fromJson(Map<String, dynamic> json) {
-    return EnergyReading(
-      voltage: json['voltage'].toDouble(),
-      current: json['current'].toDouble(),
-      timestamp: DateTime.parse(json['timestamp']),
-    );
-  }
-
-  // Method to calculate power
-  double calculatePower() {
-    return voltage * current;
-  }
-}
-```
-
-#### Asynchronous Programming
-```dart
-// Example of async data fetching
-Future<List<EnergyReading>> fetchReadings() async {
-  try {
-    // Simulate API call
-    await Future.delayed(Duration(seconds: 1));
-    
-    return [
-      EnergyReading(
-        voltage: 230.0,
-        current: 5.0,
-        timestamp: DateTime.now(),
-      ),
-    ];
-  } catch (e) {
-    print('Error: $e');
-    return [];
-  }
-}
-
-// Using async/await
-void loadData() async {
-  final readings = await fetchReadings();
-  print('Received ${readings.length} readings');
-}
-```
-
-### Flutter Widget Examples
-
-#### Basic Screen Structure
-```dart
-class DashboardScreen extends StatefulWidget {
-  @override
-  _DashboardScreenState createState() => _DashboardScreenState();
-}
-
-class _DashboardScreenState extends State<DashboardScreen> {
-  List<EnergyReading> readings = [];
-  bool isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    loadData();
-  }
-
-  Future<void> loadData() async {
-    setState(() => isLoading = true);
-    readings = await fetchReadings();
-    setState(() => isLoading = false);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Dashboard')),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: readings.length,
-              itemBuilder: (context, index) {
-                final reading = readings[index];
-                return ListTile(
-                  title: Text('Power: ${reading.calculatePower()} W'),
-                  subtitle: Text('Time: ${reading.timestamp}'),
-                );
-              },
-            ),
-    );
-  }
-}
-```
-
-#### Custom Chart Widget
-```dart
-class PowerGraph extends StatelessWidget {
-  final List<EnergyReading> readings;
-
-  const PowerGraph({Key? key, required this.readings}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 200,
-      child: LineChart(
-        LineChartData(
-          lineBarsData: [
-            LineChartBarData(
-              spots: readings.map((reading) {
-                return FlSpot(
-                  reading.timestamp.millisecondsSinceEpoch.toDouble(),
-                  reading.calculatePower(),
-                );
-              }).toList(),
-              isCurved: true,
-              color: Colors.blue,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-```
-
-### State Management Example
-
-#### Using Provider
-```dart
-// Energy state management
-class EnergyProvider with ChangeNotifier {
-  List<EnergyReading> _readings = [];
-  bool _isLoading = false;
-
-  List<EnergyReading> get readings => _readings;
-  bool get isLoading => _isLoading;
-
-  Future<void> fetchReadings() async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      _readings = await fetchReadings();
-    } catch (e) {
-      print('Error: $e');
-    }
-
-    _isLoading = false;
-    notifyListeners();
-  }
-}
-
-// Using in widget
-class EnergyMonitor extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<EnergyProvider>(
-      builder: (context, provider, child) {
-        if (provider.isLoading) {
-          return CircularProgressIndicator();
-        }
-        return PowerGraph(readings: provider.readings);
-      },
-    );
-  }
-}
-```
-
-### API Integration Example
-```dart
-class ApiService {
-  final String baseUrl = 'https://api.smartgrid.tata.com/v1';
-  final Dio _dio = Dio();
-
-  Future<List<EnergyReading>> getReadings() async {
-    try {
-      final response = await _dio.get('$baseUrl/readings');
-      return (response.data as List)
-          .map((json) => EnergyReading.fromJson(json))
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to fetch readings: $e');
-    }
-  }
-
-  Future<void> sendCommand(String deviceId, String command) async {
-    try {
-      await _dio.post('$baseUrl/devices/$deviceId/command', data: {
-        'command': command,
-        'timestamp': DateTime.now().toIso8601String(),
-      });
-    } catch (e) {
-      throw Exception('Failed to send command: $e');
-    }
-  }
-}
-```
-
-### Local Storage Example
-```dart
-class StorageService {
-  late SharedPreferences _prefs;
-
-  Future<void> init() async {
-    _prefs = await SharedPreferences.getInstance();
-  }
-
-  Future<void> saveReadings(List<EnergyReading> readings) async {
-    final String data = jsonEncode(
-      readings.map((r) => {
-        'voltage': r.voltage,
-        'current': r.current,
-        'timestamp': r.timestamp.toIso8601String(),
-      }).toList(),
-    );
-    await _prefs.setString('readings', data);
-  }
-
-  Future<List<EnergyReading>> loadReadings() async {
-    final String? data = _prefs.getString('readings');
-    if (data == null) return [];
-
-    final List<dynamic> json = jsonDecode(data);
-    return json.map((j) => EnergyReading.fromJson(j)).toList();
-  }
-}
-```
-
-### Common Flutter Widgets Used
-```dart
-// Layout Widgets
-Scaffold         // Basic screen structure
-Container        // Styling and positioning
-Row, Column     // Linear layouts
-Stack           // Overlay widgets
-ListView        // Scrollable list
-GridView        // Grid layout
-
-// Input Widgets
-TextField       // Text input
-Switch          // Toggle input
-Slider          // Range input
-DatePicker      // Date selection
-
-// Display Widgets
-Text            // Text display
-Image           // Image display
-Icon            // Material icons
-Card           // Material design card
-
-// Navigation
-Navigator       // Screen navigation
-BottomNavigationBar  // Tab navigation
-Drawer          // Side menu
-```
-
-### Development Tips
-1. Use `const` constructors when possible for better performance
-2. Implement proper error handling and loading states
-3. Follow the BLoC pattern for complex state management
-4. Use proper code organization and folder structure
-5. Implement proper form validation
-6. Use theme data for consistent styling
-7. Implement proper error boundaries
-8. Use proper navigation patterns
-9. Implement proper testing
-10. Use proper logging and analytics
-
-## Development Process
-
-### Project Structure Overview
-```
-tata/
-├── lib/
-│   ├── app/              # App configuration and theme
-│   ├── features/         # Main feature modules
-│   ├── core/            # Core functionality
-│   └── shared/          # Shared components
-├── assets/              # Images, fonts, etc.
-└── test/               # Unit and widget tests
-```
-
-### Feature Modules
+### Feature Modules Organization
 ```
 features/
-├── auth/               # Authentication & authorization
-├── dashboard/         # Main dashboard & monitoring
-├── trading/          # Energy trading features
-└── settings/        # App configuration
+├── auth/           # Authentication & authorization 
+├── dashboard/      # Main dashboard & monitoring
+├── trading/        # Energy trading features
+└── settings/       # App configuration
 ```
 
-### Development Phases
+### Development Process
 
 #### Phase 1: Core Setup
 ```mermaid
@@ -947,26 +639,13 @@ graph TD
     D --> E[Deployment]
 ```
 
-### Build Process
-```bash
-# Development
-flutter run --flavor development
-
-# Staging
-flutter build apk --flavor staging
-
-# Production
-flutter build apk --flavor production
-flutter build ios --flavor production
-```
-
 ### Testing Strategy
 - Unit Tests: Core logic and calculations
 - Widget Tests: UI components
 - Integration Tests: Full features
 - Performance Tests: Load handling
 
-### Deployment Steps
+### Deployment Process
 1. Version Update
 2. Testing Verification
 3. Asset Optimization
@@ -980,6 +659,18 @@ flutter build ios --flavor production
 - Power Quality Monitoring
 - Grid Stability Metrics
 
+### Development Guidelines
+1. Consistent code structure
+2. Proper error handling
+3. State management best practices
+4. Clean architecture principles
+5. Regular performance audits
+6. Comprehensive testing
+7. Security best practices
+8. Documentation maintenance
+9. Code review process
+10. Version control standards
+
 ## Contributing
 This is a proprietary project. No external contributions are accepted.
 
@@ -991,4 +682,3 @@ by NIKHIL KUMAWAT
 All rights reserved.
 
 This software and associated documentation are proprietary and confidential.
-````
