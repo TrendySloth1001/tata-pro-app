@@ -897,260 +897,88 @@ Drawer          // Side menu
 
 ## Development Process
 
-### 1. Environment Setup
+### Project Structure Overview
+```
+tata/
+├── lib/
+│   ├── app/              # App configuration and theme
+│   ├── features/         # Main feature modules
+│   ├── core/            # Core functionality
+│   └── shared/          # Shared components
+├── assets/              # Images, fonts, etc.
+└── test/               # Unit and widget tests
+```
+
+### Feature Modules
+```
+features/
+├── auth/               # Authentication & authorization
+├── dashboard/         # Main dashboard & monitoring
+├── trading/          # Energy trading features
+└── settings/        # App configuration
+```
+
+### Development Phases
+
+#### Phase 1: Core Setup
+```mermaid
+graph TD
+    A[Project Setup] --> B[Base Architecture]
+    B --> C[Core Services]
+    C --> D[Theme & Design System]
+    D --> E[Network Layer]
+```
+
+#### Phase 2: Feature Implementation
+```mermaid
+graph TD
+    A[Authentication] --> B[Dashboard]
+    B --> C[Monitoring]
+    C --> D[Trading]
+    D --> E[Settings]
+```
+
+#### Phase 3: Integration & Testing
+```mermaid
+graph TD
+    A[Hardware Integration] --> B[API Integration]
+    B --> C[Testing]
+    C --> D[Performance Optimization]
+    D --> E[Deployment]
+```
+
+### Build Process
 ```bash
-# Required installations
-flutter doctor
-flutter pub get
-flutter clean
+# Development
+flutter run --flavor development
 
-# Environment configuration
-cp .env.example .env
-flutter pub run build_runner build
+# Staging
+flutter build apk --flavor staging
+
+# Production
+flutter build apk --flavor production
+flutter build ios --flavor production
 ```
 
-### 2. Project Structure Creation
-```
-lib/
-├── app/
-│   ├── app.dart                 # App initialization
-│   └── theme.dart              # App theme
-├── features/
-│   ├── auth/                   # Authentication
-│   ├── dashboard/              # Main dashboard
-│   ├── trading/               # Energy trading
-│   └── settings/              # App settings
-├── core/
-│   ├── constants/             # App constants
-│   ├── errors/               # Error handlers
-│   └── utils/                # Utilities
-└── shared/
-    ├── widgets/              # Shared widgets
-    └── services/            # Shared services
-```
+### Testing Strategy
+- Unit Tests: Core logic and calculations
+- Widget Tests: UI components
+- Integration Tests: Full features
+- Performance Tests: Load handling
 
-### 3. Development Phases
+### Deployment Steps
+1. Version Update
+2. Testing Verification
+3. Asset Optimization
+4. Build Generation
+5. Store Submission
 
-#### Phase 1: Core Setup (Week 1-2)
-```mermaid
-gantt
-    title Core Development Phase
-    dateFormat  YYYY-MM-DD
-    section Setup
-    Project Setup           :a1, 2024-01-01, 3d
-    Theme Implementation    :a2, after a1, 2d
-    section Core
-    Base Classes           :a3, after a2, 3d
-    Network Layer          :a4, after a3, 3d
-    Storage Setup          :a5, after a4, 3d
-```
-
-#### Phase 2: Feature Implementation (Week 3-6)
-```mermaid
-gantt
-    title Feature Implementation
-    dateFormat  YYYY-MM-DD
-    section Auth
-    Login/Register        :b1, 2024-01-15, 5d
-    Biometric Auth        :b2, after b1, 3d
-    section Dashboard
-    UI Implementation     :b3, after b2, 5d
-    Real-time Updates     :b4, after b3, 4d
-    section Trading
-    Trading UI            :b5, after b4, 5d
-    Trading Logic         :b6, after b5, 5d
-```
-
-#### Phase 3: Integration (Week 7-8)
-```mermaid
-gantt
-    title Integration Phase
-    dateFormat  YYYY-MM-DD
-    section Backend
-    API Integration       :c1, 2024-02-15, 5d
-    Data Sync            :c2, after c1, 3d
-    section Hardware
-    Sensor Integration   :c3, after c2, 5d
-    Testing              :c4, after c3, 5d
-```
-
-### 4. Testing Strategy
-
-#### Unit Testing
-```dart
-void main() {
-  group('Energy Calculations', () {
-    test('Power calculation should be correct', () {
-      final reading = EnergyReading(voltage: 230, current: 5);
-      expect(reading.calculatePower(), equals(1150));
-    });
-    
-    test('Energy consumption should accumulate', () {
-      final meter = SmartMeter();
-      meter.addReading(100);
-      meter.addReading(150);
-      expect(meter.totalConsumption, equals(250));
-    });
-  });
-}
-```
-
-#### Integration Testing
-```dart
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-  group('End-to-end test', () {
-    testWidgets('Complete trading flow', (tester) async {
-      await tester.pumpWidget(MyApp());
-      
-      // Login
-      await tester.enterText(find.byType(TextField).first, 'test@example.com');
-      await tester.tap(find.byType(ElevatedButton));
-      
-      // Navigate to trading
-      await tester.tap(find.byIcon(Icons.swap_horiz));
-      await tester.pumpAndSettle();
-      
-      // Verify trading screen
-      expect(find.text('Energy Trading'), findsOneWidget);
-    });
-  });
-}
-```
-
-### 5. Deployment Process
-
-#### Release Checklist
-```
-□ Version bump in pubspec.yaml
-□ Changelog update
-□ Environment variables check
-□ Asset optimization
-□ ProGuard rules verification
-□ API endpoint confirmation
-□ Performance testing
-□ Security audit
-```
-
-#### Build Commands
-```bash
-# Android Release
-flutter build apk --release --no-tree-shake-icons
-flutter build appbundle --release
-
-# iOS Release
-flutter build ios --release
-cd ios && pod install && cd ..
-```
-
-### 6. Monitoring and Analytics
-
-#### Performance Metrics
-```dart
-class PerformanceMonitor {
-  static void trackScreenLoad(String screenName) {
-    final startTime = DateTime.now();
-    // Screen load logic
-    final duration = DateTime.now().difference(startTime);
-    analytics.logEvent(
-      name: 'screen_load',
-      parameters: {
-        'screen': screenName,
-        'duration': duration.inMilliseconds,
-      },
-    );
-  }
-}
-```
-
-#### Error Tracking
-```dart
-class ErrorTracker {
-  static void captureError(
-    dynamic error,
-    StackTrace stackTrace,
-  ) {
-    Sentry.captureException(
-      error,
-      stackTrace: stackTrace,
-    );
-  }
-}
-```
-
-### 7. Optimization Guidelines
-
-#### Memory Management
-```dart
-// Use const constructors
-const MyWidget({Key? key}) : super(key: key);
-
-// Dispose controllers
-@override
-void dispose() {
-  _controller.dispose();
-  super.dispose();
-}
-
-// Image caching
-Image.network(
-  url,
-  cacheWidth: 300,
-  cacheHeight: 300,
-)
-```
-
-#### Performance Tips
-```dart
-// Lazy loading
-ListView.builder(
-  itemCount: items.length,
-  itemBuilder: (context, index) {
-    return ItemWidget(item: items[index]);
-  },
-);
-
-// Compute intensive tasks
-final result = await compute(heavyCalculation, data);
-```
-
-### 8. Documentation
-
-#### Code Documentation
-```dart
-/// Calculates the total power consumption over a period
-///
-/// Parameters:
-/// - [readings] List of power readings
-/// - [interval] Time interval in minutes
-///
-/// Returns the total consumption in kWh
-double calculateConsumption(List<Reading> readings, int interval) {
-  // Implementation
-}
-```
-
-#### API Documentation
-```yaml
-/api/v1/readings:
-  get:
-    summary: Fetch power readings
-    parameters:
-      - name: startDate
-        in: query
-        required: true
-        schema:
-          type: string
-          format: date-time
-    responses:
-      200:
-        description: List of readings
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Reading'
-```
+### Monitoring
+- Performance Metrics
+- Error Tracking
+- Usage Analytics
+- Power Quality Monitoring
+- Grid Stability Metrics
 
 ## Contributing
 This is a proprietary project. No external contributions are accepted.
@@ -1163,3 +991,4 @@ by NIKHIL KUMAWAT
 All rights reserved.
 
 This software and associated documentation are proprietary and confidential.
+````
