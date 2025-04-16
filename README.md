@@ -671,6 +671,132 @@ graph TD
 9. Code review process
 10. Version control standards
 
+## Project Structure Overview
+
+### Core Files
+```
+lib/main.dart
+Purpose: Application entry point
+- Initializes app configurations
+- Sets up dependency injection
+- Configures global state management
+- Handles app lifecycle
+
+lib/app/theme.dart
+Purpose: Visual styling configuration
+- Defines color schemes
+- Sets typography styles
+- Configures component themes
+- Manages dark/light modes
+
+lib/app/config.dart
+Purpose: Environment configuration
+- API endpoints
+- Feature flags
+- Environment variables
+- Global constants
+```
+
+### Feature Modules
+
+```
+lib/features/auth/
+Purpose: Authentication System
+- Login/Registration flows
+- Biometric authentication
+- Token management
+- Session handling
+- Security protocols
+
+lib/features/dashboard/
+Purpose: Main Interface
+- Real-time monitoring
+- Power consumption graphs
+- Grid status overview
+- Alert notifications
+- Quick actions
+
+lib/features/trading/
+Purpose: Energy Trading Platform
+- Market overview
+- Buy/Sell operations
+- Price calculations
+- Transaction history
+- Trading analytics
+
+lib/features/settings/
+Purpose: Configuration Interface
+- User preferences
+- Device settings
+- Notification controls
+- System configurations
+- Profile management
+```
+
+### Core Services
+
+```
+lib/services/
+├── api_service.dart        # HTTP client & API endpoints
+├── storage_service.dart    # Local data persistence
+├── auth_service.dart       # Authentication management
+├── mqtt_service.dart       # Real-time communication
+├── analytics_service.dart  # Usage tracking & metrics
+└── calculation_service.dart # Power calculations
+
+lib/models/
+├── user_model.dart         # User data structure
+├── device_model.dart       # Device configurations
+├── reading_model.dart      # Power readings
+├── trade_model.dart        # Trading operations
+└── settings_model.dart     # User preferences
+```
+
+### Utility Modules
+
+```
+lib/utils/
+├── constants.dart          # Global constants
+├── formatters.dart        # Data formatting
+├── validators.dart        # Input validation
+├── calculations.dart      # Mathematical operations
+└── converters.dart        # Data type conversion
+
+lib/widgets/
+├── charts/                # Visualization components
+├── forms/                 # Input components
+├── cards/                # Display components
+├── dialogs/              # Modal components
+└── common/               # Shared UI elements
+```
+
+### Test Directory
+
+```
+test/
+├── unit/                 # Logic & calculation tests
+├── widget/              # UI component tests
+├── integration/         # Feature flow tests
+└── mocks/              # Test data & mocks
+```
+
+### Assets Directory
+
+```
+assets/
+├── images/              # Graphics & icons
+├── fonts/              # Typography files
+├── animations/         # Lottie files
+└── config/            # Static configurations
+```
+
+Each module follows these architectural principles:
+- Single Responsibility
+- Clean Architecture
+- Dependency Injection
+- SOLID Principles
+- Reactive Programming
+
 ## Contributing
 This is a proprietary project. No external contributions are accepted.
 
